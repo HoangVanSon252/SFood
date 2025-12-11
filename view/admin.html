@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" />
+    <title>Quản lý cửa hàng</title>
+</head>
+<body>
+    <header class="header">
+        <button class="menu-icon-btn">
+            <div class="menu-icon">
+                <i class="fa-regular fa-bars"></i>
+            </div>
+        </button>
+    </header>
+    <div class="container">
+        <aside class="sidebar open">
+            <div class="top-sidebar">
+                <a href="#" class="channel-logo"><img src="../assets/img/logo.png" alt="Channel Logo"></a>
+            </div>
+            <div class="middle-sidebar">
+                <ul class="sidebar-list">
+                    <li class="sidebar-list-item tab-content active">
+                        <a href="#" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-solid fa-house"></i></div>
+                            <div class="hidden-sidebar">Trang tổng quan</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="#" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-solid fa-bowl-food"></i></div>
+                            <div class="hidden-sidebar">Sản phẩm</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="#" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="hidden-sidebar">Khách hàng</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="#" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                            <div class="hidden-sidebar">Đơn hàng</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="#" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                            <div class="hidden-sidebar">Doanh Số</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-sidebar">
+                <ul class="sidebar-list">
+                    <li class="sidebar-list-item user-logout">
+                        <a href="./index.html" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-solid fa-circle-chevron-left"></i></div>
+                            <div class="hidden-sidebar">Trang chủ</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item user-logout">
+                        <a href="#" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-solid fa-circle-user"></i></div>
+                            <div class="hidden-sidebar" id="name-acc"></div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item user-logout">
+                        <a href="#" class="sidebar-link" id="logout-acc">
+                            <div class="sidebar-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+                            <div class="hidden-sidebar">Đăng xuất</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        <main class="content">
+            <div class="section" id="overview">
+                <h1 class="page-title">Tổng Quan</h1>
+                <div class="cards">
+                    <div class="card-single">
+                        <div class="box">
+                            <h2 id="amount-user">0</h2>
+                            <div class="on-box">
+                                <h3>Khách hàng</h3>
+                                <p>Khách hàng không chỉ là người tiêu thụ, mà còn là những người bạn đồng hành. 
+                                Họ mang đến cơ hội để tạo ra kỷ niệm đáng nhớ.
+                                Lắng nghe và thấu hiểu nhu cầu của khách hàng là chìa khóa giữ chân họ quay lại và xây dựng lòng trung thành.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-single">
+                        <div class="box">
+                            <div class="on-box">
+                                <h2 id="amount-product">0</h2>
+                                <h3>Sản phẩm</h3>
+                                <p>Sản phẩm là tâm huyết của doanh nghiệp, phản ánh chất lượng và sự sáng tạo. 
+                                Chất lượng và hương vị hấp dẫn không chỉ đáp ứng nhu cầu khách hàng mà còn tạo ra trải nghiệm đáng nhớ.
+                                Cải tiến và đổi mới sản phẩm là chìa khóa để duy trì sự cạnh tranh và xây dựng lòng tin từ người tiêu dùng.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-single">
+                        <div class="box">
+                            <h2 id="doanh-thu">$0</h2>
+                            <div class="on-box">
+                                <h3>Doanh thu</h3>
+                                <p>Doanh thu là chỉ số quan trọng phản ánh hiệu quả kinh doanh, tạo ra từ việc bán sản phẩm hoặc dịch vụ.
+                                Doanh thu cao giúp duy trì hoạt động và tạo cơ hội đầu tư.
+                                Để tăng doanh thu, doanh nghiệp cần chú trọng chất lượng sản phẩm, dịch vụ khách hàng và marketing hiệu quả.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- product -->
+            <div class="section" id="product-all">
+                <div class="admin-control">
+                    <div class="admin-control-left">
+                        <select name="the-loai" id="the-loai" onchange="filterProduct(event)">
+                            <option>Tất cả</option>
+                            <option>Món chay</option>
+                            <option>Món mặn</option>
+                            <option>Món lẩu</option>
+                            <option>Món ăn vặt</option>
+                            <option>Món tráng miệng</option>
+                            <option>Nước uống</option>
+                            <option>Đã xóa</option>
+                        </select>
+                    </div>
+                    <div class="admin-control-center">
+                        <form action="" class="form-search">
+                            <span class="search-btn" onclick="searchProduct()"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <input id="form-search-product" type="text" class="form-search-input" placeholder="Tìm kiếm tên món...">
+                        </form>
+                    </div>
+                    <div class="admin-control-right">
+                        <button class="btn-control-large" id="btn-cancel-product" onclick="filterProduct(event)"><i class="fa-light fa-rotate-right"></i> Làm mới</button>
+                        <button class="btn-control-large" id="btn-add-product"><i class="fa-light fa-plus"></i> Thêm món mới</button>                  
+                    </div>
+                </div>
+                <div id="show-product"></div>
+                <div class="page-nav">
+                    <ul class="page-nav-list">
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../assets/js/admin.js"></script>
+</body>
+</html>
