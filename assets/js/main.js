@@ -157,29 +157,46 @@ function displayList(products, currentPage, itemsPerPage) {
 
 function setupPagination(totalProducts, itemsPerPage) {
     const pageNavList = document.querySelector('.page-nav-list');
-    pageNavList.innerHTML = ''; // Xóa nội dung cũ
+    pageNavList.innerHTML = ''; 
     const pageCount = Math.ceil(totalProducts / itemsPerPage);
+
     for (let page = 1; page <= pageCount; page++) {
         let node = document.createElement('li');
         node.classList.add('page-nav-item');
         node.innerHTML = `<a href="javascript:;">${page}</a>`;
+
+        // Kiểm tra active lúc khởi tạo
         if (currentPage === page) {
             node.classList.add('active');
         }
+
         node.addEventListener('click', function () {
-            currentPage = page;
-            localStorage.setItem('currentPage', currentPage); // Lưu trạng thái trang
-            displayList(products, currentPage, itemsPerPage); // Gọi displayList với sản phẩm và trang hiện tại
-            // Cập nhật lớp active
-            let t = document.querySelectorAll('.page-nav-item.active');
-            for (let i = 0; i < t.length; i++) {
-                t[i].classList.remove('active');
+            // 1. Cập nhật biến toàn cục NGAY LẬP TỨC
+            currentPage = page; 
+
+            // 2. Lưu trang MỚI vào localStorage (Code cũ của bạn lưu trang cũ)
+            localStorage.setItem('currentPage', currentPage);
+
+            // 3. Cập nhật giao diện (UI) ngay lập tức để người dùng thấy phản hồi nhanh
+            // Tìm thằng đang active cũ để xóa đi
+            let currentActive = document.querySelector('.page-nav-item.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
             }
+            // Thêm active vào thằng mới bấm
             node.classList.add('active');
-            // Cuộn đến phần dịch vụ
-            document.getElementById("home-service").scrollIntoView();
+
+            // 4. Gọi hàm hiển thị dữ liệu
+            displayList(products, currentPage, itemsPerPage);
+
+            // 5. Scroll mượt mà hơn
+            const serviceSection = document.getElementById("home-service");
+            if (serviceSection) {
+                serviceSection.scrollIntoView({ behavior: "smooth" });
+            }
         });
-        pageNavList.appendChild(node); // Thêm phần tử li vào danh sách
+
+        pageNavList.appendChild(node);
     }
 }
 //Xem Chi Tiết Sản Phẩm
