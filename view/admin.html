@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/animations.css">
+    <link rel="stylesheet" href="../assets/css/toast.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" />
     <title>Quản lý cửa hàng</title>
 </head>
@@ -58,7 +60,7 @@
             <div class="bottom-sidebar">
                 <ul class="sidebar-list">
                     <li class="sidebar-list-item user-logout">
-                        <a href="./index.html" class="sidebar-link">
+                        <a href="../index.html" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-solid fa-circle-chevron-left"></i></div>
                             <div class="hidden-sidebar">Trang chủ</div>
                         </a>
@@ -149,8 +151,16 @@
                     </ul>
                 </div>
             </div>
-        </main>
+            <div class="section" id="customer-all" style="display:none">
+                <h1 class="page-title">Khach hang</h1>
+                <div id="show-customer"></div>
+            </div>
+            <div class="section" id="order-all" style="display:none">
+                <h1 class="page-title">Don hang</h1>
+                <div id="show-order"></div>
+            </div>        </main>
     </div>
+    <script src="../assets/js/toast.js"></script>
     <script src="../assets/js/admin.js"></script>
 </body>
 </html>

@@ -88,13 +88,19 @@ function closeModal() {
 }
 
 //show list ra các sản phẩm(producst)
-const itemsPerPage = 8; // Số sản phẩm hiển thị trên mỗi trang
+const itemsPerPage = 8;
 let currentPage = parseInt(localStorage.getItem('currentPage')) || 1;
-let products = JSON.parse(localStorage.getItem('products')) ?? null;
+let products = [];
 
-// Hiển thị danh sách sản phẩm ban đầus
-displayList(products, currentPage, itemsPerPage);
-setupPagination(products.length, itemsPerPage);
+// API: Lấy sản phẩm từ Backend
+fetch('/api/products')
+    .then(res => res.json())
+    .then(data => {
+        products = data;
+        displayList(products, currentPage, itemsPerPage);
+        setupPagination(products.length, itemsPerPage);
+    })
+    .catch(err => console.error('Lỗi tải sản phẩm:', err));
 
 function renderProducts(products) {
     let productHtml = '';
@@ -203,7 +209,7 @@ function setupPagination(totalProducts, itemsPerPage) {
 function detailProduct(index) {
     let body = document.body;
     let modal = document.querySelector('.modall.product-detail');
-    let products = JSON.parse(localStorage.getItem('products'));
+    // local products removed
     event.preventDefault();
     let infoProduct = products.find(sp=>{
         return sp.id == index
@@ -225,7 +231,7 @@ function detailProduct(index) {
                                 <input class="plus is-form" type="button" value="+" onclick="increasingNumber(this)">
                             </div>
                         </div>
-                        <p class="product-description">${infoProduct.desc}</p>
+                        <p class="product-description">${infoProduct.desc_text}</p>
                     </div>
                     <div class="notebox">
                         <p class="notebox-title">Ghi chú</p>
@@ -263,7 +269,7 @@ function detailProduct(index) {
         if (localStorage.getItem('currentuser')) {
             addCart(infoProduct.id);
         } else {
-            alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+            showToast({title: 'Lỗi!', message: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng', type: 'error'});
         }
 
     })
@@ -288,7 +294,9 @@ function decreasingNumber(e) {
 }
 //Them San Pham Vao Gio Hang
 function addCart(index) {
-    let currentusers = localStorage.getItem('currentuser') ? JSON.parse(localStorage.getItem('currentuser')) : [];
+    let currentusers = localStorage.getItem('currentuser') ? JSON.parse(localStorage.getItem('currentuser')) : null;
+    if (!currentusers) return;
+    currentusers.cart = Array.isArray(currentusers.cart) ? currentusers.cart : [];
     let soLuong = document.querySelector('.input-qty').value;
     let noteBox = document.querySelector('#popup-detail-note').value;
     let note = noteBox == "" ? "Không có ghi chú" : noteBox;
@@ -314,12 +322,9 @@ function addCart(index) {
 // lấy ra số lượng sản phẩm khi thêm vào giỏ hàng
 
 function getAmountCart() {
-    let currentusers = JSON.parse(localStorage.getItem('currentuser'));
-    let amount = 0;
-    currentusers.cart.forEach(element => {
-        amount +=parseInt(element.soLuong);
-    });
-    return amount;
+    const currentUser = JSON.parse(localStorage.getItem('currentuser'));
+    if (!currentUser || !Array.isArray(currentUser.cart)) return 0;
+    return currentUser.cart.reduce((amount, item) => amount + Number(item.soLuong || 0), 0);
 }
 function updateAmount() {
     if(localStorage.getItem('currentuser') != null){
@@ -330,7 +335,7 @@ function updateAmount() {
 
 // lấy sản phẩm từ localstorage
 function getProduct(item) {
-    let products = JSON.parse(localStorage.getItem('products'));
+    // local products removed
     let infoProductCart = products.find(sp => item.id == sp.id);
     let product = {
         ...infoProductCart,
@@ -338,14 +343,13 @@ function getProduct(item) {
     }
     return product;
 }
-window.onload = updateAmount();
-window.onload = updateCartTotal();
+window.addEventListener('load', () => { updateAmount(); updateCartTotal(); kiemtradangnhap(); });
 
 // Hiển thị giỏ hàng
 function showCart() {
     if (localStorage.getItem('currentuser') != null) {
         let currentuser = JSON.parse(localStorage.getItem('currentuser'));
-        if (currentuser.cart.length != 0) {
+        if (Array.isArray(currentuser.cart) && currentuser.cart.length != 0) {
             document.querySelector('.cart-empty').style.display = 'none';
             document.querySelector('button.thanh-toan').classList.remove('disabled');
             let productcarthtml = '';
@@ -395,7 +399,7 @@ function showCart() {
 //Xóa Sản Phẩm Trong Giỏ Hàng
 function deleteCartItem(id) {
     let currentUser = JSON.parse(localStorage.getItem('currentuser'));
-    let vitri = currentUser.cart.findIndex(item => item.id = id)
+    let vitri = currentUser.cart.findIndex(item => item.id == id)
     currentUser.cart.splice(vitri, 1);
     const productElement = document.querySelector(`[data-id='${id}']`);
     if (productElement) {
@@ -445,26 +449,24 @@ function saveAmountCart() {
 
 //Update cart total
 function updateCartTotal() {
-    document.querySelector('.text-price').innerText = vnd(getCartTotal());
+    const totalElement = document.querySelector('.text-price');
+    if (totalElement) totalElement.innerText = vnd(getCartTotal());
 }
 
 // Lay tong tien don hang
 function getCartTotal() {
-    let currentUser = JSON.parse(localStorage.getItem('currentuser'));
-    let tongtien = 0;
-    if (currentUser != null) {
-        currentUser.cart.forEach(item => {
-            let product = getProduct(item);
-            tongtien += (parseInt(product.soLuong) * parseInt(product.price));
-        });
-    }
-    return tongtien;
+    const currentUser = JSON.parse(localStorage.getItem('currentuser'));
+    if (!currentUser || !Array.isArray(currentUser.cart)) return 0;
+    return currentUser.cart.reduce((total, item) => {
+        const product = getProduct(item);
+        return total + (Number(item.soLuong || 0) * Number(product?.price || 0));
+    }, 0);
 }
 
 // Chức năng đăng ký
 let signupButton = document.getElementById('signup-button');
 let loginButton = document.getElementById('login-button');
-signupButton.addEventListener('click', () => {
+signupButton.addEventListener('click', (event) => {
     event.preventDefault();
     let fullNameUser = document.getElementById('fullname').value;
     let phoneUser = document.getElementById('phone').value;
@@ -527,64 +529,63 @@ signupButton.addEventListener('click', () => {
                 cart: [],
                 userType: 0
             }
-            let accounts = localStorage.getItem('accounts') ? JSON.parse(localStorage.getItem('accounts')) : [];
-            console.log(accounts);
-            
-            let checkloop = accounts.some(account => {
-                return account.phone == user.phone;
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullname: fullNameUser, phone: phoneUser, password: passwordUser })
             })
-            if (!checkloop) {
-                accounts.push(user);
-                localStorage.setItem('accounts', JSON.stringify(accounts));
-                localStorage.setItem('currentuser', JSON.stringify(user));
-                alert('Đăng ký thành công');
-                closeModal();
-            } else {
-                alert("Tài Khoản Đã Tồn Tại!")
-            }
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast({title: 'Thành công!', message: 'Đăng ký thành công! Vui lòng đăng nhập.', type: 'success'});
+                    closeModal();
+                } else {
+                    showToast({title: 'Lỗi!', message: data.error || "Tài Khoản Đã Tồn Tại!", type: 'error'});
+                }
+            })
+            .catch(err => console.error(err));
         }
     }
 });
-loginButton.addEventListener('click', () => {
+loginButton.addEventListener('click', (event) => {
     event.preventDefault();
     let phonelog = document.getElementById('phone-login').value;
     let passlog = document.getElementById('password-login').value;
-    let accounts = JSON.parse(localStorage.getItem('accounts'));
+    let accounts = []; // Bỏ sử dụng accounts từ localStorage
 
     if (phonelog.length == 0) {
         document.querySelector('.form-message.phonelog').innerHTML = 'Vui lòng nhập vào số điện thoại';
-    } else if (phonelog.length != 10) {
-        document.querySelector('.form-message.phonelog').innerHTML = 'Vui lòng nhập vào số điện thoại 10 số';
-        document.getElementById('phone-login').value = '';
     } else {
         document.querySelector('.form-message.phonelog').innerHTML = '';
     }
 
     if (passlog.length == 0) {
         document.querySelector('.form-message-check-login').innerHTML = 'Vui lòng nhập mật khẩu';
-    } else if (passlog.length < 6) {
-        document.querySelector('.form-message-check-login').innerHTML = 'Vui lòng nhập mật khẩu lớn hơn 6 kí tự';
-        document.getElementById('passwordlogin').value = '';
     } else {
         document.querySelector('.form-message-check-login').innerHTML = '';
     }
 
     if (phonelog && passlog) {
-        let vitri = accounts.findIndex(item => item.phone == phonelog);
-        if (vitri == -1) {
-            alert('Tài khoản của bạn không tồn tại');
-        } else if (accounts[vitri].password == passlog) {
-            if(accounts[vitri].status == 0) {
-            alert('Tài khoản của bạn đã bị khóa');
-            } else {
-                localStorage.setItem('currentuser', JSON.stringify(accounts[vitri]));
-                alert('Đăng nhập thành công');
+        fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: phonelog, password: passlog })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('currentuser', JSON.stringify(data.user));
+                showToast({title: 'Thành công!', message: 'Đăng nhập thành công', type: 'success'});
                 closeModal();
                 kiemtradangnhap();
+                if (data.user.userType == 1) {
+                    window.location.href = './view/admin.html';
+                }
+            } else {
+                showToast({title: 'Lỗi!', message: data.error || 'Sai mật khẩu hoặc tài khoản', type: 'error'});
             }
-        } else {
-            alert('Sai mật khẩu');
-        }
+        })
+        .catch(err => console.error(err));
     }
 });
 
@@ -611,7 +612,6 @@ function loOut() {
 function searchProduct() {
     event.preventDefault();
     let search = document.getElementById('search').value;
-    let products = JSON.parse(localStorage.getItem('products'));
     let producstSearch = products.filter(value => {
         return value.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(search.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
     });
@@ -628,7 +628,6 @@ document.getElementById('search').addEventListener('keypress', function (even) {
 });
 //Header Search
 function menuSearch(catagoryMenu) {
-    products = JSON.parse(localStorage.getItem('products'));
     let menuSearch = products.filter(value => {
         return value.category.toString().toUpperCase().includes(catagoryMenu.toUpperCase());
     });
@@ -644,9 +643,6 @@ function filterProduct(event) {
     let searchCategorySelect = document.getElementById('advanced-search-category-select').value;
     let minPrice = parseFloat(document.getElementById('min-price').value);
     let maxPrice = parseFloat(document.getElementById('max-price').value);
-
-    // Lấy danh sách sản phẩm từ localStorage
-    let products = JSON.parse(localStorage.getItem('products'));
 
     // Lọc theo loại sản phẩm
     let filteredProducts = products;
@@ -681,4 +677,152 @@ function filterProduct(event) {
     // Hiển thị danh sách sản phẩm và thiết lập phân trang
     displayList(filteredProducts, currentPage, itemsPerPage);
     setupPagination(filteredProducts.length, itemsPerPage);
+}
+
+// Xử lý Thanh Toán (Checkout)
+document.querySelector('button.thanh-toan')?.addEventListener('click', function() {
+    if(this.classList.contains('disabled')) return;
+    
+    let currentUsers = localStorage.getItem('currentuser');
+    if (!currentUsers) {
+        showToast({title: 'Thông báo', message: 'Vui lòng đăng nhập để thanh toán', type: 'info'});
+        return;
+    }
+    
+    let user = JSON.parse(currentUsers);
+    if (!user.cart || user.cart.length === 0) {
+        showToast({title: 'Thông báo', message: 'Giỏ hàng trống', type: 'info'});
+        return;
+    }
+    
+    let cartForApi = user.cart.map(item => {
+        let productDetails = getProduct(item); // Lấy giá từ biến toàn cục
+        return {
+            id: item.id,
+            quantity: item.soLuong,
+            price: productDetails.price
+        };
+    });
+    
+    // Tính tổng tiền
+    let totalPrice = cartForApi.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: user.id || 1, 
+            total_price: totalPrice,
+            cart_items: cartForApi
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            showToast({title: 'Thành công!', message: 'Thanh toán thành công! Mã đơn: ' + data.order_id, type: 'success'});
+            // Xóa giỏ hàng local
+            user.cart = [];
+            localStorage.setItem('currentuser', JSON.stringify(user));
+            if(typeof closeCart === 'function') closeCart();
+            setTimeout(() => { window.location.reload(); }, 1500); 
+        } else {
+            showToast({title: 'Lỗi!', message: 'Có lỗi xảy ra: ' + data.error, type: 'error'});
+        }
+    })
+    .catch(err => console.error('Lỗi thanh toán:', err));
+});
+// Keep login modal from submitting/reloading the page.
+document.querySelector('.login-form')?.addEventListener('submit', (event) => { event.preventDefault(); loginButton.click(); });
+
+// Checkout navigation takes priority over the legacy inline checkout handler.
+const checkoutButton = document.querySelector('button.thanh-toan');
+checkoutButton?.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const rawUser = localStorage.getItem('currentuser');
+    if (!rawUser) {
+        showToast({ title: 'Thong bao', message: 'Vui long dang nhap de thanh toan', type: 'info' });
+        openLoginForm();
+        return;
+    }
+    const currentUser = JSON.parse(rawUser);
+    if (!Array.isArray(currentUser.cart) || currentUser.cart.length === 0) {
+        showToast({ title: 'Thong bao', message: 'Gio hang trong', type: 'info' });
+        return;
+    }
+    window.location.assign('/view/checkout.html');
+}, true);
+
+// Unified product query state: search, category, price and pagination always use one result set.
+let currentProductView = [];
+const normalizeText = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+function displayList(sourceProducts, page = 1, pageSize = itemsPerPage) {
+    currentProductView = (Array.isArray(sourceProducts) ? sourceProducts : []).filter(product => Number(product.status) === 1);
+    const pageCount = Math.max(1, Math.ceil(currentProductView.length / pageSize));
+    currentPage = Math.min(Math.max(1, Number(page) || 1), pageCount);
+    localStorage.setItem('currentPage', currentPage);
+    const start = (currentPage - 1) * pageSize;
+    renderProducts(currentProductView.slice(start, start + pageSize));
+    setupPagination(currentProductView, pageSize);
+}
+
+function setupPagination(sourceProducts, pageSize = itemsPerPage) {
+    const pageNavList = document.querySelector('.page-nav-list');
+    if (!pageNavList) return;
+    const list = Array.isArray(sourceProducts) ? sourceProducts : currentProductView;
+    const pageCount = Math.ceil(list.length / pageSize);
+    pageNavList.innerHTML = '';
+    for (let page = 1; page <= pageCount; page++) {
+        const node = document.createElement('li');
+        node.className = `page-nav-item${page === currentPage ? ' active' : ''}`;
+        node.innerHTML = `<a href="#">${page}</a>`;
+        node.addEventListener('click', event => {
+            event.preventDefault();
+            currentPage = page;
+            displayList(list, currentPage, pageSize);
+            document.getElementById('home-service')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        pageNavList.appendChild(node);
+    }
+}
+
+function searchProduct(event) {
+    event?.preventDefault();
+    const keyword = normalizeText(document.getElementById('search')?.value);
+    const result = products.filter(product => normalizeText(product.title).includes(keyword));
+    displayList(result, 1, itemsPerPage);
+}
+
+function menuSearch(category) {
+    const wanted = normalizeText(category);
+    const result = products.filter(product => normalizeText(product.category).includes(wanted));
+    displayList(result, 1, itemsPerPage);
+}
+
+function filterProduct(event) {
+    event?.preventDefault();
+    const actionId = event?.currentTarget?.id || event?.target?.closest('button')?.id || '';
+    const category = document.getElementById('advanced-search-category-select')?.value || 'Tất cả';
+    const min = Number(document.getElementById('min-price')?.value);
+    const max = Number(document.getElementById('max-price')?.value);
+    const hasMin = Number.isFinite(min) && document.getElementById('min-price')?.value !== '';
+    const hasMax = Number.isFinite(max) && document.getElementById('max-price')?.value !== '';
+
+    if (actionId === 'reset-search') {
+        document.getElementById('advanced-search-category-select').value = 'Tất cả';
+        document.getElementById('min-price').value = '';
+        document.getElementById('max-price').value = '';
+        displayList(products, 1, itemsPerPage);
+        return;
+    }
+
+    let result = products.filter(product => {
+        const categoryMatch = normalizeText(category) === normalizeText('Tất cả') || normalizeText(product.category).includes(normalizeText(category));
+        const price = Number(product.price);
+        return categoryMatch && (!hasMin || price >= min) && (!hasMax || price <= max);
+    });
+    if (actionId === 'sort-ascending') result = [...result].sort((a, b) => Number(a.price) - Number(b.price));
+    if (actionId === 'sort-descending') result = [...result].sort((a, b) => Number(b.price) - Number(a.price));
+    displayList(result, 1, itemsPerPage);
 }

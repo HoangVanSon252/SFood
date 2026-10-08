@@ -1,0 +1,99 @@
+/* ===================== TOAST MESSAGE ===================== */
+#toast-container {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    z-index: 999999;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 50px; /* Fully rounded corners like the image */
+    padding: 20px 25px;
+    min-width: 400px;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    animation: slideInLeft ease .3s, fadeOut linear 1s 3s forwards;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(calc(100% + 32px));
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
+
+.toast__icon {
+    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    color: #fff;
+}
+
+.toast__body {
+    flex-grow: 1;
+    margin: 0 20px;
+}
+
+.toast__title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.toast__msg {
+    font-size: 15px;
+    color: #666;
+    margin: 0;
+}
+
+.toast__close {
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.toast__close:hover {
+    color: #333;
+}
+
+/* Modifiers */
+.toast--success .toast__icon {
+    background-color: #47d864; /* Green */
+}
+.toast--success .toast__title {
+    color: #47d864;
+}
+
+.toast--error .toast__icon {
+    background-color: #ff4d4f; /* Red */
+}
+.toast--error .toast__title {
+    color: #ff4d4f;
+}
+
+.toast--info .toast__icon {
+    background-color: #2f86eb; /* Blue */
+}
+.toast--info .toast__title {
+    color: #2f86eb;
+}

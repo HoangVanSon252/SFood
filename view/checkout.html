@@ -1,0 +1,30 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thanh toán | SFood</title>
+  <link rel="stylesheet" href="../assets/css/checkout.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+</head>
+<body>
+  <header class="checkout-header"><a href="../index.html" class="brand"><img src="../assets/img/logo.png" alt="SFood"><span>SFood</span></a><a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại mua hàng</a></header>
+  <main class="checkout-shell">
+    <section class="checkout-intro"><span>THANH TOÁN AN TOÀN</span><h1>Hoàn tất đơn hàng</h1><p>Kiểm tra thông tin giao hàng và xác nhận đặt món.</p></section>
+    <div class="checkout-grid">
+      <form id="checkout-form" class="checkout-card form-card">
+        <h2><i class="fa-solid fa-location-dot"></i> Thông tin nhận hàng</h2>
+        <div class="form-grid"><label>Họ và tên<input id="customer-name" required></label><label>Số điện thoại<input id="customer-phone" inputmode="tel" required></label></div>
+        <label>Địa chỉ giao hàng<textarea id="customer-address" rows="3" required placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."></textarea></label>
+        <label>Ghi chú cho cửa hàng<textarea id="order-note" rows="2" placeholder="Ví dụ: ít đá, không hành..."></textarea></label>
+        <h2><i class="fa-solid fa-wallet"></i> Phương thức thanh toán</h2>
+        <label class="payment-option"><input type="radio" name="payment" value="cod" checked><span><b>Thanh toán khi nhận hàng</b><small>Thanh toán trực tiếp cho shipper</small></span><i class="fa-solid fa-money-bill-wave"></i></label>
+        <label class="payment-option"><input type="radio" name="payment" value="bank"><span><b>Chuyển khoản ngân hàng</b><small>Nhân viên sẽ liên hệ xác nhận</small></span><i class="fa-solid fa-building-columns"></i></label>
+        <button class="place-order" type="submit">Xác nhận đặt hàng <i class="fa-solid fa-arrow-right"></i></button>
+      </form>
+      <aside class="checkout-card summary-card"><h2>Đơn hàng của bạn</h2><div id="checkout-items" class="checkout-items"></div><div class="summary-line"><span>Tạm tính</span><strong id="subtotal">0 ₫</strong></div><div class="summary-line"><span>Phí giao hàng</span><strong>Miễn phí</strong></div><div class="summary-total"><span>Tổng cộng</span><strong id="checkout-total">0 ₫</strong></div><p class="secure-note"><i class="fa-solid fa-shield-heart"></i> Thông tin của bạn được bảo mật.</p></aside>
+    </div>
+  </main>
+  <script src="../assets/js/checkout.js"></script>
+</body>
+</html>
